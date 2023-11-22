@@ -1,0 +1,27 @@
+const express = require('express');
+const sharp = require('sharp');
+
+const app = express();
+
+app.use(express.json());
+
+app.post('/colorize', (req, res) => {
+  const imageBase64 = req.body.imageBase64;
+  const buffer = Buffer.from(imageBase64, 'base64');
+
+  sharp(buffer)
+    .resize(500, 500) // Resize the image for processing
+    .toBuffer()
+    .then(colorizedImageBuffer => {
+      const colorizedImageData = colorizedImageBuffer.toString('base64');
+      res.json({ colorizedImageData });
+    })
+    .catch(error => {
+      console.error('Error colorizing image:', error);
+      res.status(500).send('Error colorizing image');
+    });
+});
+
+app.listen(3000, () => {
+  console.log('Server listening on port 3000');
+});
